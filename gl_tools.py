@@ -1,8 +1,11 @@
 import numpy as np
+#from matplotlib import rc
 import matplotlib.pyplot as plt
 import networkx as nx
+from graphical_lasso import graphical_lasso
+from sklearn.covariance import GraphLasso
 
-
+#rc('text', usetex=True)
 
 
 def save_covariance_matrix_heatmap( matrix, axis_labels, title, filename ):
@@ -44,6 +47,29 @@ def save_network_graph( matrix, labels, title, filename ):
 	plt.savefig( filename )
 
 	return
+
+def save_network_graph_sequence( data, alpha_seq, labels, filename):
+	if len(alpha_seq)%2 != 0:
+		print "make alpha an even number please."
+		return
+
+	n = len(alpha_seq)
+	labels = dict( zip( range( len(labels) ), labels) )
+	fig = plt.figure()
+	for i in range(n):
+		ax = fig.add_subplot(n/2,2,i+1)
+		gl = GraphLasso( alpha = alpha_seq[i] )
+		
+		gl.fit( data )
+		D = nx.Graph( gl.precision_ )
+		pos_labels = nx.circular_layout( D )
+		for k,item in pos_labels.iteritems():
+			pos_labels[k] = item + 0.1
+		nx.draw_circular( D, scale = 4, node_size = 150, ax = ax, with_labels = True, labels = labels, font_size = 8)
+		#nx.draw_networkx_labels(D, pos_labels, ax=ax, labels= labels, font_size = 12)
+		ax.set_title( "alpha = %.2e"%alpha_seq[i])
+
+	plt.savefig( filename )
 
 
 def absolute_daily_returns( ts) :
