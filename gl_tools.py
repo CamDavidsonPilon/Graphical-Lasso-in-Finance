@@ -33,7 +33,7 @@ def save_covariance_matrix_heatmap( matrix, axis_labels, title, filename ):
 	plt.savefig( filename )
 	return 
 
-def save_network_graph( matrix, labels, title, filename ):
+def save_network_graph_old( matrix, labels, title, filename ):
 	D = nx.Graph( matrix )
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
@@ -70,6 +70,41 @@ def save_network_graph_sequence( data, alpha_seq, labels, filename):
 		ax.set_title( "alpha = %.2e"%alpha_seq[i])
 
 	plt.savefig( filename )
+
+
+def save_network_graph( matrix, labels, filename, scale=3):
+	labels = dict( zip( range( len(labels) ), labels) )
+	d = matrix.shape[0]
+	D = nx.Graph(matrix)
+	#D.add_nodes_from( range(d) )
+	#for i in range(d):
+	#	for j in range(i):
+	#			if matrix[i,j] != 0:
+	#				D.add_edge( i, j, weight = matrix[i,j])
+	weights = [ D[x][y]['weight'] for x,y in D.edges() ] 
+	#weights = weights/np.max( np.abs( weights ) ) 
+	cmap = plt.get_cmap( "jet" ) #or some other one
+	
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	pos = nx.circular_layout( D, scale =scale )
+	bweights = [ 5*(1-1*(x<0)) for x in weights ]
+	nx.draw_networkx_edges( D, pos, ax = ax, edge_cmap = cmap, edge_color = bweights, edge_vmin = 0, edge_vmax = 11, width=[10*abs(w)  for w in weights])
+	nx.draw_networkx_nodes( D, pos, ax=ax, node_size = 350, node_color="white")
+	nx.draw_networkx_labels( D, pos,font_size=9, labels = labels, ax = ax)
+	plt.axis("off")
+	plt.savefig( filename)
+	return
+	
+	
+	#draw.
+	
+	
+			
+			
+ 
+	pos_nodes = nx.spring_layout( D, scale = 3 )   
+
 
 
 def absolute_daily_returns( ts) :
