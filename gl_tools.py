@@ -20,15 +20,15 @@ def save_covariance_matrix_heatmap( matrix, axis_labels, title, filename ):
 		return
 
 	fig = plt.figure()
-	ax = fig.subplot( 111)
-	cax = ax.imshow( matrix, interpolation = 'none')
+	ax = plt.subplot( 111)
+	cax = ax.imshow( matrix, interpolation = "nearest", vmax=1, vmin=0)
 	ax.set_title( title)
 	
-	cbar = fig.colorbar( cax, ticks = [-1,0,1] )
-	cbar.ax.set_yticklabels( ["-1", "0", "1" ] )
+	cbar = fig.colorbar( cax, ticks = [1,0] )
+	cbar.ax.set_yticklabels( ["1", "0"] )
 	
-	ax.xticks( range(len(axis_labels) ), axis_labels, size="small" ) 
-	ax.yticks( range(len(axis_labels) ), axis_labels, size="small" ) 
+	plt.xticks( range(len(axis_labels) ), axis_labels, size="small", rotation = 90 ) 
+	plt.yticks( range(len(axis_labels) ), axis_labels, size="small" ) 
 	
 	plt.savefig( filename )
 	return 
@@ -67,12 +67,12 @@ def save_network_graph_sequence( data, alpha_seq, labels, filename):
 			pos_labels[k] = item + 0.1
 		nx.draw_circular( D, scale = 4, node_size = 150, ax = ax, with_labels = True, labels = labels, font_size = 6 )
 		#nx.draw_networkx_labels(D, pos_labels, ax=ax, labels= labels, font_size = 12)
-		ax.set_title( "alpha = %.2e"%alpha_seq[i])
+		ax.set_title( r"$\alpha$ = %.2e"%alpha_seq[i])
 
 	plt.savefig( filename )
 
 
-def save_network_graph( matrix, labels, filename, scale=3, layout = "circular"):
+def save_network_graph( matrix, labels, filename, scale=8, layout = "circular"):
 	labels = dict( zip( range( len(labels) ), labels) )
 	d = matrix.shape[0]
 	D = nx.Graph(matrix)
@@ -85,18 +85,18 @@ def save_network_graph( matrix, labels, filename, scale=3, layout = "circular"):
 	#weights = weights/np.max( np.abs( weights ) ) 
 	cmap = plt.get_cmap( "jet" ) #or some other one
 	
-	fig = plt.figure(figsize=(7,7))
+	fig = plt.figure(figsize=(50,50))
 	ax = fig.add_subplot(111)
 	if layout == "circular":
 		pos = nx.circular_layout( D, scale =scale )
 	elif layout == "spring":
 		pos = nx.spring_layout( D ,scale = scale)
 	#bweights = [ 1+100*(x-min(weights))/( max(weights)- min(weights) ) for x in weights ]
-	bweights = [ 'r'*(z<0) + 'k'*(z>0) for z in weights ]
+	bweights = [ 'k'*(z<0) + 'r'*(z>0) for z in weights ]
 	print bweights
-	nx.draw_networkx_edges( D, pos, ax = ax,edge_vmin=0, edge_vmax=100, edge_cmap=cmap, edge_color = bweights, width=[6*np.log( abs(1.3*w)+1)  for w in weights])
-	nx.draw_networkx_nodes( D, pos, ax=ax, node_size = 350, node_color="white")
-	nx.draw_networkx_labels( D, pos,font_size=9, labels = labels, ax = ax)
+	nx.draw_networkx_edges( D, pos, ax = ax,edge_vmin=0, edge_vmax=100, edge_cmap=cmap, edge_color = bweights, width=[abs(4*w)**(2.5)  for w in weights])
+	nx.draw_networkx_nodes( D, pos, ax=ax, node_size = 0, node_color="white")
+	nx.draw_networkx_labels( D, pos,font_size=20, labels = labels, ax = ax)
 	plt.axis("off")
 	plt.savefig( filename, bbox_inches="tight")
 	return
