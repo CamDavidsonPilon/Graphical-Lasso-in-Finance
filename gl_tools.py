@@ -72,7 +72,7 @@ def save_network_graph_sequence( data, alpha_seq, labels, filename):
 	plt.savefig( filename )
 
 
-def save_network_graph( matrix, labels, filename, scale=8, layout = "circular"):
+def save_network_graph( matrix, labels, filename, title, scale=8, layout = "circular", weight = lambda x: abs(4*x)**(2.5) ):
 	labels = dict( zip( range( len(labels) ), labels) )
 	d = matrix.shape[0]
 	D = nx.Graph(matrix)
@@ -93,11 +93,14 @@ def save_network_graph( matrix, labels, filename, scale=8, layout = "circular"):
 		pos = nx.spring_layout( D ,scale = scale)
 	#bweights = [ 1+100*(x-min(weights))/( max(weights)- min(weights) ) for x in weights ]
 	bweights = [ 'k'*(z<0) + 'r'*(z>0) for z in weights ]
+	width = [ weight(w) for w in weights]
 	print bweights
-	nx.draw_networkx_edges( D, pos, ax = ax,edge_vmin=0, edge_vmax=100, edge_cmap=cmap, edge_color = bweights, width=[abs(4*w)**(2.5)  for w in weights])
+	print width
+	nx.draw_networkx_edges( D, pos, ax = ax,edge_vmin=0, edge_vmax=1, edge_cmap=cmap, edge_color = bweights, width=width)
 	nx.draw_networkx_nodes( D, pos, ax=ax, node_size = 0, node_color="white")
 	nx.draw_networkx_labels( D, pos,font_size=20, labels = labels, ax = ax)
 	plt.axis("off")
+	plt.title(title)
 	plt.savefig( filename, bbox_inches="tight")
 	return
 	
