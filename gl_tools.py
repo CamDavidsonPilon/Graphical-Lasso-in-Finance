@@ -83,22 +83,22 @@ def save_network_graph( matrix, labels, filename, title, scale=8, layout = "circ
 	#				D.add_edge( i, j, weight = matrix[i,j])
 	weights = [ D[x][y]['weight'] for x,y in D.edges() ] 
 	#weights = weights/np.max( np.abs( weights ) ) 
-	cmap = plt.get_cmap( "jet" ) #or some other one
+	cmap = plt.get_cmap( "Reds" ) #or some other one
 	
 	fig = plt.figure(figsize=(50,50))
 	ax = fig.add_subplot(111)
 	if layout == "circular":
 		pos = nx.circular_layout( D, scale =scale )
 	elif layout == "spring":
-		pos = nx.spring_layout( D ,scale = scale)
+		pos = nx.spring_layout( D ,scale = scale, iterations = 35 )
 	#bweights = [ 1+100*(x-min(weights))/( max(weights)- min(weights) ) for x in weights ]
 	bweights = [ 'k'*(z<0) + 'r'*(z>0) for z in weights ]
 	width = [ weight(w) for w in weights]
 	print bweights
 	print width
-	nx.draw_networkx_edges( D, pos, ax = ax,edge_vmin=0, edge_vmax=1, edge_cmap=cmap, edge_color = bweights, width=width)
-	nx.draw_networkx_nodes( D, pos, ax=ax, node_size = 0, node_color="white")
-	nx.draw_networkx_labels( D, pos,font_size=20, labels = labels, ax = ax)
+	nx.draw_networkx_edges( D, pos, ax = ax,edge_vmin=-0.2, edge_vmax=4, edge_cmap=cmap, edge_color = width, width=width)
+	nx.draw_networkx_nodes( D, pos, ax=ax, node_size = 0, node_color="red")
+	nx.draw_networkx_labels( D, pos,font_size=15, labels = labels, ax = ax)
 	plt.axis("off")
 	plt.title(title)
 	plt.savefig( filename, bbox_inches="tight")
